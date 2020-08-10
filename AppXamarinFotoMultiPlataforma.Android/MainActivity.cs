@@ -1,18 +1,16 @@
-﻿using System;
-
-using Android.App;
-using Android.Content.PM;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
-using Android.OS;
-using Android.Database;
-using Android.Provider;
-using Xamarin.Forms;
-using System.Collections.Generic;
+﻿using Android.App;
 using Android.Content;
-using Plugin.CurrentActivity;
+using Android.Content.PM;
+using Android.Database;
+using Android.OS;
+using Android.Provider;
+using Android.Runtime;
+using Android.Widget;
 using CarouselView.FormsPlugin.Android;
+using Plugin.CurrentActivity;
+using System;
+using System.Collections.Generic;
+using Xamarin.Forms;
 
 namespace AppXamarinFotoMultiPlataforma.Droid
 {
@@ -25,7 +23,7 @@ namespace AppXamarinFotoMultiPlataforma.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
 
-            //NuGet Initializations
+            //NuGet 
             CrossCurrentActivity.Current.Init(this, savedInstanceState);
             CarouselViewRenderer.Init();
             FFImageLoading.Forms.Platform.CachedImageRenderer.Init(enableFastRenderer: false);
@@ -44,20 +42,20 @@ namespace AppXamarinFotoMultiPlataforma.Droid
         }
 
 
-        #region Image Picker Implementation
+        #region Implementacao Image Picker
         public static int OPENGALLERYCODE = 100;
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             base.OnActivityResult(requestCode, resultCode, data);
 
-            //If we are calling multiple image selection, enter into here and return photos and their filepaths.
+            //Se estivermos chamando a seleção de várias imagens, entre aqui e retorne as fotos e seus caminhos de arquivo
             if (requestCode == OPENGALLERYCODE && resultCode == Result.Ok)
             {
                 List<string> images = new List<string>();
 
                 if (data != null)
                 {
-                    //Separate all photos and get the path from them all individually.
+                    //Separa todas as fotos obtendo o caminho individualmente.
                     ClipData clipData = data.ClipData;
                     if (clipData != null)
                     {
@@ -85,14 +83,14 @@ namespace AppXamarinFotoMultiPlataforma.Droid
                         }
                     }
 
-                    //Send our images to the carousel view.
+                    //Envia imagens para a visualização do carousel view.
                     MessagingCenter.Send<App, List<string>>((App)Xamarin.Forms.Application.Current, "ImagesSelectedAndroid", images);
                 }
             }
         }
 
         /// <summary>
-        ///     Get the real path for the current image passed.
+        ///     Obtem o caminho real para a imagem atual
         /// </summary>
         public String GetRealPathFromURI(Android.Net.Uri contentURI)
         {

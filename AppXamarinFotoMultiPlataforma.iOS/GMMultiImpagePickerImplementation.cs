@@ -33,7 +33,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
         private TaskCompletionSource<List<string>> _completionSource;
 
         /// <summary>
-        ///     Called if the images are not modified.
+        ///     Imagens NÃO modificadas.
         /// </summary>
         /// <returns></returns>
         public Task<List<string>> PickMultiImage()
@@ -44,7 +44,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             if (Interlocked.CompareExchange(ref _completionSource, ntcs, null) != null)
             {
 #if DEBUG
-                throw new InvalidOperationException("Only one operation can be active at a time");
+                throw new InvalidOperationException("Apenas uma operação pode estar ativa por vez");
 #else
                 return null;
 #endif
@@ -56,7 +56,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
         }
 
         /// <summary>
-        ///     Called if the images are modified.
+        ///     Retorna Imagens modificadas
         /// </summary>
         /// <returns></returns>
         public Task<List<string>> PickMultiImage(bool needsHighQuality)
@@ -67,13 +67,13 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             if (Interlocked.CompareExchange(ref _completionSource, ntcs, null) != null)
             {
 #if DEBUG
-                throw new InvalidOperationException("Only one operation can be active at a time");
+                throw new InvalidOperationException("Apenas uma operação pode estar ativa por vez");
 #else
                 return null;
 #endif
             }
 
-            //init media picker with high quality format.
+            //inicia a midia com formato de alta qualidade.
             ShowImagePicker(needsHighQuality);
             return _completionSource.Task;
         }
@@ -82,12 +82,12 @@ namespace AppXamarinFotoMultiPlataforma.iOS
 
         public void ShowImagePicker(bool needsHighQuality)
         {
-            //Create the image gallery picker.
+            //Cria Galeria como ImagePicker.
             var picker = new GMImagePickerController
             {
-                Title = "Select Photo",
-                CustomDoneButtonTitle = "Finished",
-                CustomCancelButtonTitle = "Cancel",
+                Title = "Selecione Foto",
+                CustomDoneButtonTitle = "Terminado",
+                CustomCancelButtonTitle = "Cancelar",
                 ColsInPortrait = 4,
                 ColsInLandscape = 7,
                 MinimumInteritemSpacing = 2.0f,
@@ -109,21 +109,22 @@ namespace AppXamarinFotoMultiPlataforma.iOS
                 NavigationBarTintColor = Color.White.ToUIColor()
             };
 
-            //Set a limit on the number of photos the user can select. I use 12 selected photos beause of memory limitations on iOS.
+            //Define um limite para o número de fotos que o usuário pode selecionar (12 devido às limitações de memória no iOS)..
             picker.ShouldSelectAsset += (sender, args) => args.Cancel = picker.SelectedAssets.Count > 11;
 
-            // select image handler
+            //selecionar manipulador de imagens
             GMImagePickerController.MultiAssetEventHandler[] handler = { null };
-            //cancel handler
+
+            //Manipulador de cancelamento
             EventHandler[] cancelHandler = { null };
 
-            //define the handler
+            //define o manipulador
             handler[0] = (sender, args) =>
             {
                 var tcs = Interlocked.Exchange(ref _completionSource, null);
                 picker.FinishedPickingAssets -= handler[0];
                 picker.Canceled -= cancelHandler[0];
-                System.Diagnostics.Debug.WriteLine("User finished picking assets. {0} items selected.", args.Assets.Length);
+                System.Diagnostics.Debug.WriteLine("Usuário terminou de selecionad as fotos. {0} items seleccionados.", args.Assets.Length);
                 var imageManager = new PHImageManager();
                 var RequestImageOption = new PHImageRequestOptions();
 
@@ -142,7 +143,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
                 _preselectedAssets = args.Assets;
                 if (!_preselectedAssets.Any())
                 {
-                    //no image selected
+                    //sem imagem selecionada
                     tcs.TrySetResult(null);
                 }
                 else
@@ -155,7 +156,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
                     {
                         DispatchQueue.MainQueue.DispatchAsync(() =>
                         {
-                            //For each image, create a file path for it.
+                            //Para cada imagem, cria um caminho
                             imageManager.RequestImageForAsset(asset,
                                 PHImageManager.MaximumSize,
                                 PHImageContentMode.Default,
@@ -164,14 +165,14 @@ namespace AppXamarinFotoMultiPlataforma.iOS
                                 {
                                     using (NSAutoreleasePool autoreleasePool = new NSAutoreleasePool())
                                     {
-                                        System.Diagnostics.Debug.WriteLine("Total memory being used: {0}", GC.GetTotalMemory(false));
+                                        System.Diagnostics.Debug.WriteLine("Total memória usada: {0}", GC.GetTotalMemory(false));
                                         var filename = Guid.NewGuid().ToString();
-                                        System.Diagnostics.Debug.WriteLine("filename: " + filename);
+                                        System.Diagnostics.Debug.WriteLine("arquivo: " + filename);
                                         string filepath = Save(image, filename.ToString(), documentsDirectory);
-                                        System.Diagnostics.Debug.WriteLine("filepath: " + filepath);
+                                        System.Diagnostics.Debug.WriteLine("caminho: " + filepath);
                                         images.Add(filepath);
 
-                                        //When we are on the last image, send the images to the carousel view.
+                                        //Quando for a ultima imagem, envia para o carousel view.
                                         if (cnt == args.Assets.Length)
                                         {
                                             Device.BeginInvokeOnMainThread(() =>
@@ -181,7 +182,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
                                         }
                                         cnt++;
 
-                                        //Dispose of objects and call the garbage collector.
+                                        //Descarta os objetos e chama o garbage collector.
                                         asset.Dispose();
                                         autoreleasePool.Dispose();
                                         GC.Collect();
@@ -203,7 +204,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             };
             picker.Canceled += cancelHandler[0];
 
-            //show picker
+            //Mostra as fotos
             picker.PresentUsingRootViewController();
         }
 
@@ -216,7 +217,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             NSError err = null;
             if (imgData.Save(jpgFilename, NSDataWritingOptions.Atomic, out err))
             {
-                //Dispose of objects.
+                //Descarta objetos
                 origImage.Dispose();
                 resizedImage.Dispose();
                 imgData.Dispose();
@@ -224,7 +225,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             }
             else
             {
-                Console.WriteLine("NOT saved as " + jpgFilename + " because" + err.LocalizedDescription);
+                Console.WriteLine("Nao foi salvo o arquivo " + jpgFilename + " porque " + err.LocalizedDescription);
                 return null;
             }
         }
@@ -244,8 +245,7 @@ namespace AppXamarinFotoMultiPlataforma.iOS
         }
 
         /// <summary>
-        ///     Call this when you want to delete our temporary images.
-        ///     Recommendation: Call this after successfully uploading images to Azure Blob Storage.
+        ///     Quando deseja excluir os arquivos temporários
         /// </summary>
         void IGMMultiImagePicker.ClearFileDirectory()
         {
@@ -264,5 +264,19 @@ namespace AppXamarinFotoMultiPlataforma.iOS
             }
         }
 
+
+        /*
+       Example of how to call ClearFileDirectory():
+
+           if (Device.RuntimePlatform == Device.Android)
+           {
+               DependencyService.Get<IMediaService>().ClearFileDirectory();
+           }
+           if (Device.RuntimePlatform == Device.iOS)
+           {
+               GMMultiImagePicker.Current.ClearFileDirectory();
+           }
+
+       */
     }
 }

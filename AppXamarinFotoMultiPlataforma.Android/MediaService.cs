@@ -1,11 +1,13 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Widget;
+using AppXamarinFotoMultiPlataforma.Droid;
 using AppXamarinFotoMultiPlataforma.ImagePickers.Android;
 using System;
 using System.IO;
 using Xamarin.Forms;
 
+[assembly: Xamarin.Forms.Dependency(typeof(MediaService))]
 namespace AppXamarinFotoMultiPlataforma.Droid
 {
     public class MediaService : Java.Lang.Object, IMediaService
@@ -19,19 +21,18 @@ namespace AppXamarinFotoMultiPlataforma.Droid
                 imageIntent.SetType("image/*");
                 imageIntent.PutExtra(Intent.ExtraAllowMultiple, true);
                 imageIntent.SetAction(Intent.ActionGetContent);
-                ((Activity)Forms.Context).StartActivityForResult(Intent.CreateChooser(imageIntent, "Select photo"), OPENGALLERYCODE);
-                Toast.MakeText(Xamarin.Forms.Forms.Context, "Tap and hold to select multiple photos.", ToastLength.Short).Show();
+                ((Activity)Forms.Context).StartActivityForResult(Intent.CreateChooser(imageIntent, "Selecione as Fotos"), OPENGALLERYCODE);
+                Toast.MakeText(Xamarin.Forms.Forms.Context, "Toque e segure para selecionar várias fotos", ToastLength.Short).Show();
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
-                Toast.MakeText(Xamarin.Forms.Forms.Context, "Error. Can not continue, try again.", ToastLength.Long).Show();
+                Toast.MakeText(Forms.Context, "Erro. Não é possível continuar, tente novamente.", ToastLength.Long).Show();
             }
         }
 
         /// <summary>
-        ///     Call this when you want to delete our temporary images.
-        ///     Recommendation: Call this after successfully uploading images to Azure Blob Storage.
+        ///     Deleta os arquivos temporários.
         /// </summary>
 		void IMediaService.ClearFileDirectory()
         {

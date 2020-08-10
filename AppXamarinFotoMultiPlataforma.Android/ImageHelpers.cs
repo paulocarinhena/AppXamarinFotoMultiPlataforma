@@ -8,7 +8,7 @@ namespace AppXamarinFotoMultiPlataforma.Droid
 {
     public class ImageHelpers : ICompressImages
     {
-        //collectionName is the name of the folder in your Android Pictures directory.
+        //collectionName é o nome da pasta no diretório de imagens do Android
         public static readonly string collectionName = "TmpPictures";
 
         public string SaveFile(byte[] imageByte, string fileName)
@@ -29,14 +29,14 @@ namespace AppXamarinFotoMultiPlataforma.Droid
         {
             byte[] imageBytes;
 
-            //Get the bitmap.
+            //Pega bitmap.
             var originalImage = BitmapFactory.DecodeFile(path);
 
-            //Set imageSize and imageCompression parameters.
+            //Defini os parâmetros imageSize (tamanho imagem) e imageCompression (compressão)
             var imageSize = .86;
             var imageCompression = 67;
 
-            //Resize it and then compress it to Jpeg.
+            //Redimensiona e compacta como Jpeg.
             var width = (originalImage.Width * imageSize);
             var height = (originalImage.Height * imageSize);
             var scaledImage = Bitmap.CreateScaledBitmap(originalImage, (int)width, (int)height, true);

@@ -1,15 +1,11 @@
 ﻿using AppXamarinFotoMultiPlataforma.ImagePickers.Android;
 using AppXamarinFotoMultiPlataforma.ImagePickers.iOS;
-using AppXamarinFotoMultiPlataforma.ImagePickers.UWP;
 using Plugin.Media;
 using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
@@ -102,12 +98,6 @@ namespace AppXamarinFotoMultiPlataforma
                             ImgCarouselView.ItemsSource = images;
                         }
                     });
-                }
-
-                //se for no uwp, executa IMediaService.
-                else if (Device.RuntimePlatform == Device.UWP)
-                {
-
                 }
             }
             else
